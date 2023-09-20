@@ -6,6 +6,7 @@ import style from "../../assets/styles/Modal.module.css";
 import Spinner from "react-bootstrap/Spinner";
 import ContactDetailsModal from "../ModalC/ContactDetailsModal";
 import Form from "react-bootstrap/Form";
+import Scrollbars from "react-custom-scrollbars";
 
 let debounceTimeout;
 
@@ -23,7 +24,6 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
 
   const totalPage = useRef(null);
   const currentPage = useRef(1);
-  const modalBodyRef = useRef(null);
 
   const handleClose = () => {
     if (!loading) {
@@ -40,13 +40,14 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
     clearTimeout(debounceTimeout);
     debounceTimeout = setTimeout(() => {
       searchAPI(newQuery);
-    }, 1000);
+    }, 2000);
   };
 
   // handle input Enter key
   const handleEnterKey = (e) => {
     if (!loading) {
       if (e.key === "Enter") {
+        clearTimeout(debounceTimeout);
         searchAPI(queryText);
       }
     }
@@ -54,14 +55,17 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
 
   // Function to make the API call
   async function searchAPI(query) {
+    if (loading) {
+      return;
+    }
     try {
       setLoading(true);
+      setOnlyEven(false);
       const response = await getAllContactList({
         companyId: 171,
         countryId: 226,
         query: query,
       });
-      setOnlyEven(false);
       setConatctDetails(response.contacts);
       setConstactIdList(response.contacts_ids);
     } catch (error) {
@@ -77,6 +81,7 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
     }
     try {
       setLoading(true);
+      setOnlyEven(false);
       // fetching US country data
       const contactData = await getAllContactList({
         companyId: 171,
@@ -93,37 +98,23 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
     }
   };
 
-  const handleScroll = () => {
-    const modalBody = modalBodyRef.current;
-    if (modalBody) {
-      if (
-        modalBody.scrollHeight - modalBody.scrollTop ===
-        modalBody.clientHeight
-      ) {
-        if (!loadingOnScroll && !loading) {
-          onScrollLoadData(queryText);
-        }
-      }
-    }
-  };
-
   const onScrollLoadData = async (query) => {
     if (totalPage.current && totalPage.current <= currentPage.current) {
       return;
     }
     setLoadingOnScroll(true);
+    setOnlyEven(false);
     try {
       currentPage.current += 1;
       const response = await getAllContactList({
         query: query,
         page: currentPage.current,
       });
-      setOnlyEven(false);
       setConatctDetails((old) => {
         return { ...old, ...response.contacts };
       });
       setConstactIdList((old) => {
-        return [...old, response.contacts_ids];
+        return [...old, ...response.contacts_ids];
       });
     } catch (error) {
       console.log(error);
@@ -162,20 +153,11 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
           data={currentContactDetails}
         />
       )}
-      <Modal
-        show={showModalB}
-        onHide={handleClose}
-        onShow={() => modalBodyRef.current.scrollTo(0, 0)}
-        scrollable
-      >
+      <Modal show={showModalB} onHide={handleClose}>
         <Modal.Header>
           <Modal.Title>Modal B</Modal.Title>
         </Modal.Header>
-        <Modal.Body
-          style={{ maxHeight: "calc(100vh - 200px)", overflowY: "auto" }}
-          onScroll={handleScroll}
-          ref={modalBodyRef}
-        >
+        <Modal.Body style={{ height: "550px", overflowY: "hidden" }}>
           <div className={`${style.modalButtonDiv}`}>
             <Button
               style={{
@@ -234,53 +216,68 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
           )}
           {/* Display No Data Found! */}
           {!loading && contactIdList.length === 0 && <div>No Data Found!</div>}
+          {/* Implementing Scrollbars library */}
+          <Scrollbars
+            style={{ width: "100%", height: "360px" }}
+            onScroll={(values) => {
+              const { scrollTop, scrollHeight, clientHeight } = values.target;
+              if (
+                scrollTop + clientHeight >= scrollHeight - 5 &&
+                !loadingOnScroll &&
+                !loading
+              ) {
+                onScrollLoadData(queryText);
+              }
+            }}
+          >
+            {/* Display Contact Id's in Button */}
+            <div className={!loading ? style.conatctListBody : ""}>
+              {evenFilteredId.length === 0 &&
+                contactIdList.map((item) => {
+                  return (
+                    <Button
+                      style={{
+                        backgroundColor: `${
+                          contactDetails[item]?.color
+                            ? `${contactDetails[item]?.color}`
+                            : ""
+                        }`,
+                      }}
+                      onClick={() => {
+                        setCurrentContactDetails(contactDetails[item]);
+                        setShowModalC(true);
+                      }}
+                      key={item}
+                    >
+                      {item}
+                    </Button>
+                  );
+                })}
+              {/* Display onlyEven contact Id's data */}
+              {!loading &&
+                evenFilteredId.map((item) => {
+                  return (
+                    <Button
+                      style={{
+                        backgroundColor: `${
+                          contactDetails[item]?.color
+                            ? `${contactDetails[item]?.color}`
+                            : ""
+                        }`,
+                      }}
+                      key={item}
+                      onClick={() => {
+                        setCurrentContactDetails(contactDetails[item]);
+                        setShowModalC(true);
+                      }}
+                    >
+                      {item}
+                    </Button>
+                  );
+                })}
+            </div>
+          </Scrollbars>
 
-          {/* Display Contact Id's in Button */}
-          <div className={!loading ? style.conatctListBody : ""}>
-            {evenFilteredId.length === 0 &&
-              contactIdList.map((item) => {
-                return (
-                  <Button
-                    style={{
-                      backgroundColor: `${
-                        contactDetails[item]?.color
-                          ? `${contactDetails[item]?.color}`
-                          : ""
-                      }`,
-                    }}
-                    onClick={() => {
-                      setCurrentContactDetails(contactDetails[item]);
-                      setShowModalC(true);
-                    }}
-                    key={item}
-                  >
-                    {item}
-                  </Button>
-                );
-              })}
-            {/* Display onlyEven contact Id's data */}
-            {!loading &&
-              evenFilteredId.map((item) => {
-                return (
-                  <Button
-                    style={{
-                      backgroundColor: `${
-                        contactDetails[item]?.color
-                          ? `${contactDetails[item]?.color}`
-                          : ""
-                      }`,
-                    }}
-                    key={item}
-                    onClick={() => {
-                      setCurrentContactDetails(contactDetails[item]);
-                      setShowModalC(true);
-                    }}
-                  >
-                    {item}
-                  </Button>
-                );
-              })}
-          </div>
           {/* Display Loading on Scroll */}
           {loadingOnScroll && (
             <Spinner animation="border" role="status">
