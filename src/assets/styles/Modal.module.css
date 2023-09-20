@@ -1,0 +1,19 @@
+.modalButtonDiv {
+  display: flex;
+  gap: 14px;
+}
+.footerCheckBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+}
+.conatctListBody {
+  margin-top: 14px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
