@@ -1,0 +1,9 @@
+:root {
+  --buttonAColor: #46139f;
+  --buttonBColor: #ff7f50;
+}
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
