@@ -60,7 +60,6 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
     }
     try {
       setLoading(true);
-      setOnlyEven(false);
       const response = await getAllContactList({
         companyId: 171,
         countryId: 226,
@@ -81,7 +80,6 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
     }
     try {
       setLoading(true);
-      setOnlyEven(false);
       // fetching US country data
       const contactData = await getAllContactList({
         companyId: 171,
@@ -103,11 +101,11 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
       return;
     }
     setLoadingOnScroll(true);
-    setOnlyEven(false);
     try {
       currentPage.current += 1;
       const response = await getAllContactList({
         query: query,
+        countryId: 226,
         page: currentPage.current,
       });
       setConatctDetails((old) => {
@@ -142,7 +140,7 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
     } else {
       setEvenFilteredId([]);
     }
-  }, [onlyEven]);
+  }, [onlyEven, contactIdList]);
 
   return (
     <>

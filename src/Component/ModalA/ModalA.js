@@ -26,10 +26,10 @@ function ModalA({ showModalA, setShowModalA, setActiveTab, setShowModalB }) {
   const currentPage = useRef(1);
 
   const handleClose = () => {
-    if (!loading) {
-      setShowModalA(false);
-      window.history.pushState(null, "", "/");
-    }
+    // if (!loading) {
+    setShowModalA(false);
+    window.history.pushState(null, "", "/");
+    // }
   };
 
   // Handle input change with debouncing
@@ -60,7 +60,7 @@ function ModalA({ showModalA, setShowModalA, setActiveTab, setShowModalB }) {
     }
     try {
       setLoading(true);
-      setOnlyEven(false);
+      // setOnlyEven(false);
       const response = await getAllContactList({ query: query });
       totalPage.current = response.total;
       setConatctDetails(response.contacts);
@@ -78,7 +78,7 @@ function ModalA({ showModalA, setShowModalA, setActiveTab, setShowModalB }) {
     }
     try {
       setLoading(true);
-      setOnlyEven(false);
+      // setOnlyEven(false);
       const contactData = await getAllContactList({});
       console.log(contactData);
       totalPage.current = contactData.total;
@@ -96,7 +96,7 @@ function ModalA({ showModalA, setShowModalA, setActiveTab, setShowModalB }) {
       return;
     }
     setLoadingOnScroll(true);
-    setOnlyEven(false);
+    // setOnlyEven(false);
     try {
       currentPage.current += 1;
       const response = await getAllContactList({
@@ -135,7 +135,7 @@ function ModalA({ showModalA, setShowModalA, setActiveTab, setShowModalB }) {
     } else {
       setEvenFilteredId([]);
     }
-  }, [onlyEven]);
+  }, [onlyEven, contactIdList]);
 
   return (
     <>
