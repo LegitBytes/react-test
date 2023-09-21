@@ -26,10 +26,8 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
   const currentPage = useRef(1);
 
   const handleClose = () => {
-    if (!loading) {
-      setShowModalB(false);
-      window.history.pushState(null, "", "/");
-    }
+    setShowModalB(false);
+    window.history.pushState(null, "", "/");
   };
 
   // Handle input change with debouncing
@@ -45,19 +43,14 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
 
   // handle input Enter key
   const handleEnterKey = (e) => {
-    if (!loading) {
-      if (e.key === "Enter") {
-        clearTimeout(debounceTimeout);
-        searchAPI(queryText);
-      }
+    if (e.key === "Enter") {
+      clearTimeout(debounceTimeout);
+      searchAPI(queryText);
     }
   };
 
   // Function to make the API call
   async function searchAPI(query) {
-    if (loading) {
-      return;
-    }
     try {
       setLoading(true);
       const response = await getAllContactList({
@@ -212,8 +205,6 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
               </Spinner>
             </div>
           )}
-          {/* Display No Data Found! */}
-          {!loading && contactIdList.length === 0 && <div>No Data Found!</div>}
           {/* Implementing Scrollbars library */}
           <Scrollbars
             style={{ width: "100%", height: "360px" }}
@@ -228,52 +219,59 @@ function ModalB({ showModalB, setShowModalA, setActiveTab, setShowModalB }) {
               }
             }}
           >
-            {/* Display Contact Id's in Button */}
-            <div className={!loading ? style.conatctListBody : ""}>
-              {evenFilteredId.length === 0 &&
-                contactIdList.map((item) => {
-                  return (
-                    <Button
-                      style={{
-                        backgroundColor: `${
-                          contactDetails[item]?.color
-                            ? `${contactDetails[item]?.color}`
-                            : ""
-                        }`,
-                      }}
-                      onClick={() => {
-                        setCurrentContactDetails(contactDetails[item]);
-                        setShowModalC(true);
-                      }}
-                      key={item}
-                    >
-                      {item}
-                    </Button>
-                  );
-                })}
-              {/* Display onlyEven contact Id's data */}
-              {!loading &&
-                evenFilteredId.map((item) => {
-                  return (
-                    <Button
-                      style={{
-                        backgroundColor: `${
-                          contactDetails[item]?.color
-                            ? `${contactDetails[item]?.color}`
-                            : ""
-                        }`,
-                      }}
-                      key={item}
-                      onClick={() => {
-                        setCurrentContactDetails(contactDetails[item]);
-                        setShowModalC(true);
-                      }}
-                    >
-                      {item}
-                    </Button>
-                  );
-                })}
-            </div>
+            {" "}
+            {/* Display No Data Found! */}
+            {!loading && contactIdList.length === 0 && (
+              <div className={style.conatctListBody}>No Data Found!</div>
+            )}
+            {/* Display No Data Found! */}
+            {!loading && contactIdList.length > 0 && (
+              <div className={style.conatctListBody}>
+                {evenFilteredId.length === 0 &&
+                  contactIdList.map((item) => {
+                    return (
+                      <Button
+                        style={{
+                          backgroundColor: `${
+                            contactDetails[item]?.color
+                              ? `${contactDetails[item]?.color}`
+                              : ""
+                          }`,
+                        }}
+                        onClick={() => {
+                          setCurrentContactDetails(contactDetails[item]);
+                          setShowModalC(true);
+                        }}
+                        key={item}
+                      >
+                        {item}
+                      </Button>
+                    );
+                  })}
+                {/* Display onlyEven contact Id's data */}
+                {!loading &&
+                  evenFilteredId.map((item) => {
+                    return (
+                      <Button
+                        style={{
+                          backgroundColor: `${
+                            contactDetails[item]?.color
+                              ? `${contactDetails[item]?.color}`
+                              : ""
+                          }`,
+                        }}
+                        key={item}
+                        onClick={() => {
+                          setCurrentContactDetails(contactDetails[item]);
+                          setShowModalC(true);
+                        }}
+                      >
+                        {item}
+                      </Button>
+                    );
+                  })}
+              </div>
+            )}
           </Scrollbars>
 
           {/* Display Loading on Scroll */}
